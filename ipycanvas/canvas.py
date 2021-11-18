@@ -31,8 +31,9 @@ COMMANDS = {
     'rotate': 36, 'scale': 37, 'transform': 38, 'setTransform': 39, 'resetTransform': 40,
     'set': 41, 'clear': 42, 'sleep': 43, 'fillPolygon': 44, 'strokePolygon': 45,
     'strokeLines': 46, 'fillPolygons': 47, 'strokePolygons': 48, 'strokeLineSegments': 49,
-    'fillStyledCircles': 50, 'strokeStyledCircles': 51, 'fillStyledPolygons': 52,
-    'strokeStyledPolygons': 53, 'strokeStyledLineSegments': 54
+    'fillStyledRects': 50, 'strokeStyledRects': 51, 'fillStyledCircles': 52,
+    'strokeStyledCircles': 53, 'fillStyledPolygons': 54, 'strokeStyledPolygons': 55,
+    'strokeStyledLineSegments': 56
 }
 
 
@@ -500,7 +501,7 @@ class Canvas(_CanvasBase):
         self._send_canvas_command(COMMANDS['fillRects'], args, buffers)
 
     def stroke_rects(self, x, y, width, height=None):
-        """Draw a rectangular outlines of sizes ``(width, height)`` at the ``(x, y)`` positions.
+        """Draw a rectangular outlines of sizes ``(width, height)`` at the ``(x, y)`` positions.of sizes ``(width, height)`
 
         Where ``x``, ``y``, ``width`` and ``height`` arguments are NumPy arrays, lists or scalar values.
         If ``height`` is None, it is set to the same value as width.
@@ -518,6 +519,54 @@ class Canvas(_CanvasBase):
             populate_args(height, args, buffers)
 
         self._send_canvas_command(COMMANDS['strokeRects'], args, buffers)
+
+    def fill_styled_rects(self, x, y, width, height, color, alpha):
+        """Draw filled and styled rectangles of sizes ``(width, height)`` at the ``(x, y)`` positions
+
+        Where ``x``, ``y``, ``width`` and ``height`` arguments are NumPy arrays, lists or scalar values.
+        If ``height`` is None, it is set to the same value as width.
+        ``color`` is an (n_rect x 3) NumPy array with the colors and ``alpha`` is an (n_rect) NumPy array
+        with the alpha channel values.
+        """
+        args = []
+        buffers = []
+
+        populate_args(x, args, buffers)
+        populate_args(y, args, buffers)
+        populate_args(width, args, buffers)
+
+        if height is None:
+            args.append(args[-1])
+        else:
+            populate_args(height, args, buffers)
+
+        populate_args(color, args, buffers)
+        populate_args(alpha, args, buffers)
+        self._send_canvas_command(COMMANDS['fillStyledRects'], args, buffers)
+
+    def stroke_styled_rects(self, x, y, width, height, color, alpha):
+        """Draw rectangular styled outlines of sizes ``(width, height)`` at the ``(x, y)`` positions.of sizes ``(width, height)`
+
+        Where ``x``, ``y``, ``width`` and ``height`` arguments are NumPy arrays, lists or scalar values.
+        If ``height`` is None, it is set to the same value as width.
+        ``color`` is an (n_rect x 3) NumPy array with the colors and ``alpha`` is an (n_rect) NumPy array
+        with the alpha channel values.
+        """
+        args = []
+        buffers = []
+
+        populate_args(x, args, buffers)
+        populate_args(y, args, buffers)
+        populate_args(width, args, buffers)
+
+        if height is None:
+            args.append(args[-1])
+        else:
+            populate_args(height, args, buffers)
+
+        populate_args(color, args, buffers)
+        populate_args(alpha, args, buffers)
+        self._send_canvas_command(COMMANDS['strokeStyledRects'], args, buffers)
 
     def clear_rect(self, x, y, width, height=None):
         """Clear the specified rectangular area of size ``(width, height)`` at the ``(x, y)`` position, making it fully transparent."""

@@ -72,10 +72,9 @@ const COMMANDS = [
   'putImageData', 'clip', 'save', 'restore', 'translate',
   'rotate', 'scale', 'transform', 'setTransform', 'resetTransform',
   'set', 'clear', 'sleep', 'fillPolygon', 'strokePolygon',
-  'strokeLines',
-  'fillPolygons','strokePolygons','strokeLineSegments',
-  'fillStyledCircles','strokeStyledCircles','fillStyledPolygons',
-  'strokeStyledPolygons','strokeStyledLineSegments'
+  'strokeLines','fillPolygons','strokePolygons','strokeLineSegments',
+  'fillStyledRects', 'strokeStyledRects', 'fillStyledCircles','strokeStyledCircles',
+  'fillStyledPolygons', 'strokeStyledPolygons','strokeStyledLineSegments',
 ];
 
 
@@ -403,6 +402,12 @@ class CanvasModel extends DOMWidgetModel {
       case 'strokeLineSegments':
         await this.drawPolygonOrLineSegments(args, buffers, false, false)
         break
+      case 'fillStyledRects':
+        await this.drawStyledRects(args, buffers, true)
+        break;
+      case 'strokeStyledRects':
+        await this.drawStyledRects(args, buffers, false)
+        break;
       case 'fillStyledCircles':
         await this.drawStyledCircles(args, buffers, true)
         break;
@@ -454,6 +459,30 @@ class CanvasModel extends DOMWidgetModel {
     for (let idx = 0; idx < numberRects; ++idx) {
       callback(x.getItem(idx), y.getItem(idx), width.getItem(idx), height.getItem(idx));
     }
+  }
+  private drawStyledRects(args: any[], buffers: any, fill: boolean){
+    const x = getArg(args[0], buffers);
+    const y = getArg(args[1], buffers);
+    const width = getArg(args[2], buffers);
+    const height = getArg(args[3], buffers);
+    const colors = getArg(args[4], buffers);
+    const alpha = getArg(args[5], buffers);
+
+    const numberRects = Math.min(x.length, y.length,  width.length, height.length);
+    this.ctx.save()
+    for (let idx = 0; idx < numberRects; ++idx) {
+        // get color for this circle
+        const ci = 3*idx
+        const color = `rgba(${colors.getItem(ci)}, ${colors.getItem(ci+1)}, ${colors.getItem(ci+2)}, ${alpha.getItem(idx)})`;
+        this.setStyle(color, fill)
+        if(fill)
+        {
+          this.fillRect(x.getItem(idx), y.getItem(idx), width.getItem(idx), height.getItem(idx));
+        }else{
+          this.strokeRect(x.getItem(idx), y.getItem(idx), width.getItem(idx), height.getItem(idx));
+        }
+    }
+    this.ctx.restore()
   }
 
   protected fillArc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise: boolean) {
