@@ -20,7 +20,6 @@ from ._frontend import module_name, module_version
 
 from .utils import binary_image, populate_args, image_bytes_to_array, commands_to_buffer
 
-
 _CMD_LIST = ['fillRect', 'strokeRect', 'fillRects', 'strokeRects', 'clearRect', 'fillArc',
              'fillCircle', 'strokeArc', 'strokeCircle', 'fillArcs', 'strokeArcs',
              'fillCircles', 'strokeCircles', 'strokeLine', 'beginPath', 'closePath',

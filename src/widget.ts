@@ -597,7 +597,6 @@ class CanvasModel extends DOMWidgetModel {
     this.ctx.restore()
   }
 
-
  private drawStyledArcs(args: any[], buffers: any, fill: boolean){
     const x = getArg(args[0], buffers);
     const y = getArg(args[1], buffers);
