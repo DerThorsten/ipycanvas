@@ -74,7 +74,8 @@ const COMMANDS = [
   'set', 'clear', 'sleep', 'fillPolygon', 'strokePolygon',
   'strokeLines','fillPolygons','strokePolygons','strokeLineSegments',
   'fillStyledRects', 'strokeStyledRects', 'fillStyledCircles','strokeStyledCircles',
-  'fillStyledPolygons', 'strokeStyledPolygons','strokeStyledLineSegments',
+  'fillStyledArcs', 'strokeStyledArcs', 'fillStyledPolygons',
+  'strokeStyledPolygons','strokeStyledLineSegments',
 ];
 
 
@@ -414,6 +415,12 @@ class CanvasModel extends DOMWidgetModel {
       case 'strokeStyledCircles':
         await this.drawStyledCircles(args, buffers, false)
         break;
+      case 'fillStyledArcs':
+        await this.drawStyledArcs(args, buffers, true)
+        break;
+      case 'strokeStyledArcs':
+        await this.drawStyledArcs(args, buffers, false)
+        break;
       case 'fillStyledPolygons':
         await this.drawStyledPolygonOrLineSegments(args, buffers, true, true)
         break
@@ -528,6 +535,7 @@ class CanvasModel extends DOMWidgetModel {
     }
   }
 
+
   protected fillCircle(x: number, y: number, radius: number) {
     this.ctx.beginPath();
     this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
@@ -588,6 +596,42 @@ class CanvasModel extends DOMWidgetModel {
     }
     this.ctx.restore()
   }
+
+
+ private drawStyledArcs(args: any[], buffers: any, fill: boolean){
+    const x = getArg(args[0], buffers);
+    const y = getArg(args[1], buffers);
+    const radius = getArg(args[2], buffers);
+    const startAngle = getArg(args[3], buffers);
+    const endAngle = getArg(args[4], buffers);
+    const anticlockwise = getArg(args[5], buffers);
+    const colors = getArg(args[6], buffers);
+    const alpha = getArg(args[7], buffers);
+
+    const numberArcs = Math.min(
+      x.length, y.length, radius.length,
+      startAngle.length, endAngle.length
+    );
+    this.ctx.save()
+    for (let idx = 0; idx < numberArcs; ++idx) {
+        // get color for this circle
+        const ci = 3*idx
+        const color = `rgba(${colors.getItem(ci)}, ${colors.getItem(ci+1)}, ${colors.getItem(ci+2)}, ${alpha.getItem(idx)})`;
+        this.setStyle(color, fill)
+        if(fill)
+        {
+          this.fillArc(x.getItem(idx), y.getItem(idx), radius.getItem(idx),
+            startAngle.getItem(idx), endAngle.getItem(idx),
+            anticlockwise.getItem(idx));
+        }else{
+          this.strokeArc(x.getItem(idx), y.getItem(idx), radius.getItem(idx),
+            startAngle.getItem(idx), endAngle.getItem(idx),
+            anticlockwise.getItem(idx));
+        }
+    }
+    this.ctx.restore()
+  }
+
 
   private drawStyledPolygonOrLineSegments(args: any[], buffers: any, fill: boolean, close: boolean){
 
